@@ -5,11 +5,11 @@
 // Execute `rustlings hint lifetimes3` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
 
-struct Book {
-    author: &str,
-    title: &str,
+//结构体字段不能直接使用引用，因为这些引用必须有明确的生命周期。
+struct Book<'a> {
+    author: &'a str,
+    title: &'a str,
 }
 
 fn main() {
