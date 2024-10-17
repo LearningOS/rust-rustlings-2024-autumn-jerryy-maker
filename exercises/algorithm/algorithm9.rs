@@ -2,7 +2,7 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
+
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -37,7 +37,9 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.count += 1; // 增加元素计数
+        self.items.push(value); // 将新元素加入堆中
+        self.bubble_up(self.count); // 在添加后调整堆
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +59,44 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        let left = self.left_child_idx(idx);
+        let right = self.right_child_idx(idx);
+
+        if right > self.count {
+            return left; // 如果只有左子节点
+        }
+
+        // 如果两个子节点都存在，返回较小的一个
+        if (self.comparator)(&self.items[left], &self.items[right]) {
+            left
+        } else {
+            right
+        }
+    }
+    fn bubble_up(&mut self, idx: usize) {
+        let mut idx = idx;
+        while idx > 1 {
+            let parent_idx = self.parent_idx(idx); // 在这里获取父节点的索引
+            if (self.comparator)(&self.items[idx], &self.items[parent_idx]) {
+                self.items.swap(idx, parent_idx); // 交换当前元素和父节点
+                idx = parent_idx; // 向上移动到父节点
+            } else {
+                break;
+            }
+        }
+    }
+
+    fn bubble_down(&mut self, idx: usize) {
+        let mut idx = idx;
+        while self.children_present(idx) {
+            let smallest_child = self.smallest_child_idx(idx);
+            if (self.comparator)(&self.items[smallest_child], &self.items[idx]) {
+                self.items.swap(idx, smallest_child); // 交换当前元素和最小子节点
+                idx = smallest_child; // 向下移动到子节点
+            } else {
+                break; // 如果当前元素小于等于子节点，停止
+            }
+        }
     }
 }
 
@@ -79,14 +117,24 @@ where
 
 impl<T> Iterator for Heap<T>
 where
-    T: Default,
+    T: Default + Clone,
 {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.is_empty() {
+            return None;
+        }
+
+        // 取出堆顶元素
+        let top = self.items[1].clone(); // 使用 clone，具体实现可以根据需要进行更改
+        self.items[1] = self.items[self.count].clone(); // 将最后一个元素放到堆顶
+        self.items.pop(); // 移除最后一个元素
+        self.count -= 1; // 减少计数
+        self.bubble_down(1); // 重新调整堆
+        Some(top)
     }
+    
 }
 
 pub struct MinHeap;
